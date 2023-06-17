@@ -56,7 +56,7 @@ describe('Test for Calculator', () => {
             expect(20).toBeGreaterThan(10);
 
             //toMatch se puede enviar una expresion regular y ver si cumple con esta  !Importante recordar¡
-            expect('123456').toMatch(/123/);
+            expect('123456').toMatch(/123/);    
             expect(['apples', 'oranges', 'pears']).toContain('oranges');
         });
     });
