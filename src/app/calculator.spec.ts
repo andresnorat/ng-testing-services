@@ -26,6 +26,13 @@ describe('Test for Calculator', () => {
         expect(calculator.divide(5,2)).toEqual(2.5);
     });
 
+
+    it('#divide for a zero', () =>{
+        const calculator =  new Calculator();
+
+        expect(calculator.divide(0,0)).toBeNull();
+    })
+
     it('#test matchers', () => {
         let name = 'andres';
         let name2;
