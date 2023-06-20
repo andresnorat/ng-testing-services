@@ -26,12 +26,12 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.apiUrl}/products`, { params})
     .pipe(
       retry(3),
-      // map(products => products.map(item => {
-      //   return {
-      //     ...item,
-      //     taxes: .19 * item.price
-      //   }
-      // }))
+      map(products => products.map(item => {
+        return {
+          ...item,
+          taxes: .19 * item.price
+        }
+      }))
       );
   }
 
