@@ -40,15 +40,15 @@ export class ProductService {
     .pipe(
       catchError((error: HttpErrorResponse) =>{
         if(error.status === HttpStatusCode.InternalServerError){
-          return throwError('Ups algo esta fallando en el server');
+          return throwError(()=>'Ups algo esta fallando en el server');
         }
         if(error.status === HttpStatusCode.NotFound){
-          return throwError('El producto no existe');
+          return throwError(()=>'El producto no existe');
         }
         if(error.status === HttpStatusCode.Unauthorized){
-          return throwError('Ups no tienes autorización para acceder a esta opcion');
+          return throwError(()=>'Ups no tienes autorización para acceder a esta opcion');
         }
-        return throwError('Ups algo salio mal');
+        return throwError(()=>'Ups algo salio mal');
       })
     );
   }
@@ -62,21 +62,21 @@ export class ProductService {
 
 
   create(dto: CreateProductDTO ){
-    return this.http.post<Product>(this.apiUrl,dto)
+    return this.http.post<Product>(`${this.apiUrl}/products`,dto)
   }
 
   update(id: string, dto: UpdateProductDTO){
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, dto);
+    return this.http.put<Product>(`${this.apiUrl}/products/${id}`, dto);
   }
 
   delete(id: string){
-    return this.http.delete<boolean>(`${this.apiUrl}/${id}`)
+    return this.http.delete<boolean>(`${this.apiUrl}/products/${id}`)
     .pipe(
       catchError((error: HttpErrorResponse) => {
         if(error.status === HttpStatusCode.Unauthorized){
-          return throwError('Unauthorized')
+          return throwError(()=>'Unauthorized')
         }
-        return throwError('Upps erre')
+        return throwError(()=>'Upps erre')
       })
     )
   }
@@ -98,7 +98,7 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.apiUrl}/categories/${categoryId}/products`, {params})
     .pipe(
       catchError((error) =>{
-        return throwError('Upp algo fallo');
+        return throwError(()=>'Upp algo fallo');
       })
     )
   }

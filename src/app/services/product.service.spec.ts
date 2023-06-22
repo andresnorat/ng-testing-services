@@ -1,7 +1,7 @@
 import { TestBed, } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { ProductService } from './product.service';
-import { Product } from '../models/product-model';
+import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product-model';
 import { environment } from './../../environments/environment';
 import { generateManyProducts, generateOneProduct } from '../models/product.mock';
 
@@ -17,6 +17,11 @@ fdescribe('ProductService', () => {
     productService = TestBed.inject(ProductService);
     httpController = TestBed.inject(HttpTestingController);
   });
+
+  afterEach(()=>{
+    httpController.verify();
+  })
+
 
   it('should be created', () => {
     expect(productService).toBeTruthy();
@@ -37,7 +42,6 @@ fdescribe('ProductService', () => {
       const url = `${environment.API_URL}/products`
       const req = httpController.expectOne(url);
       req.flush(mockData);
-      httpController.verify();
     });
   });
 
@@ -56,7 +60,6 @@ fdescribe('ProductService', () => {
       const url = `${environment.API_URL}/products`
       const req = httpController.expectOne(url);
       req.flush(mockData);
-      httpController.verify();
     });
 
     it('should return product list with taxes', (doneFn) => {
@@ -92,7 +95,6 @@ fdescribe('ProductService', () => {
         const url = `${environment.API_URL}/products`
         const req = httpController.expectOne(url);
         req.flush(mockData);
-        httpController.verify();
     });
 
     it('should send query params width limit 10 offset 3', (doneFn) => {
@@ -112,7 +114,81 @@ fdescribe('ProductService', () => {
       expect(params.get('limit')).toEqual(`${limit}`);
       expect(params.get('offset')).toEqual(`${offset}`);
       req.flush(mockData);
-      httpController.verify();
+    });
+  });
+
+
+  describe('test for created', () =>{
+    it('shuld return a new product', (doneFn) =>{
+
+      const mockData = generateOneProduct();
+      const dto: CreateProductDTO = {
+        title: 'new product',
+        price: 2500,
+        description: 'bal bla',
+        images: ['sdsd'],
+        categoryId: 12
+      }
+
+      productService.create({...dto})
+      .subscribe((data)=>{
+        expect(data).toEqual(mockData);
+        doneFn()
+      });
+
+      const url = `${environment.API_URL}/products`;
+      const req = httpController.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.body).toEqual(dto);
+      expect(req.request.method).toEqual('POST');
+    });
+  });
+
+  describe('test for update', () =>{
+    it('shuld return a update product', (doneFn) =>{
+
+      const mockData = generateOneProduct();
+      const idProduct = '5';
+      const dto: UpdateProductDTO = {
+        title: 'update product',
+        price: 2500,
+        description: 'bal bla',
+        images: ['sdsd'],
+        categoryId: 12
+      }
+
+      productService.update(idProduct, {...dto})
+      .subscribe((data)=>{
+        expect(data).toEqual(mockData);
+        doneFn()
+      });
+
+      const url = `${environment.API_URL}/products/${idProduct}`;
+      const req = httpController.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.body).toEqual(dto);
+      expect(req.request.method).toEqual('PUT');
+    });
+  });
+
+
+  describe('test for delete', () =>{
+    it('shuld return a update product', (doneFn) =>{
+
+      const mockData = true;
+      const idProduct = '5';
+     
+
+      productService.delete(idProduct)
+      .subscribe((data)=>{
+        expect(data).toEqual(mockData);
+        doneFn()
+      });
+
+      const url = `${environment.API_URL}/products/${idProduct}`;
+      const req = httpController.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.method).toEqual('DELETE');
     });
   });
 });
