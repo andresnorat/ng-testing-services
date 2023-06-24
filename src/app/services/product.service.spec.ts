@@ -4,6 +4,7 @@ import { ProductService } from './product.service';
 import { CreateProductDTO, Product, UpdateProductDTO } from '../models/product-model';
 import { environment } from './../../environments/environment';
 import { generateManyProducts, generateOneProduct } from '../models/product.mock';
+import { HttpStatusCode } from '@angular/common/http';
 
 fdescribe('ProductService', () => {
   let productService: ProductService;
@@ -173,12 +174,11 @@ fdescribe('ProductService', () => {
 
 
   describe('test for delete', () =>{
-    it('shuld return a update product', (doneFn) =>{
+    it('shuld return a boolean for conffirm the delete ', (doneFn) =>{
 
       const mockData = true;
       const idProduct = '5';
      
-
       productService.delete(idProduct)
       .subscribe((data)=>{
         expect(data).toEqual(mockData);
@@ -190,5 +190,72 @@ fdescribe('ProductService', () => {
       req.flush(mockData);
       expect(req.request.method).toEqual('DELETE');
     });
+  });
+
+  describe('test for getProduct', () =>{
+    it('shuld return a product', (doneFn) =>{
+
+      const mockData = generateOneProduct();
+      const idProduct = '5';
+     
+      productService.getProduct(idProduct)
+      .subscribe((data)=>{
+        expect(data).toEqual(mockData);
+        doneFn()
+      });
+
+      const url = `${environment.API_URL}/products/${idProduct}`;
+      const req = httpController.expectOne(url);
+      req.flush(mockData);
+      expect(req.request.method).toEqual('GET');
+    });
+
+
+    it('shuld return the right msg when status code is 404', (doneFn) =>{
+
+      const messageError = '404 message'
+      const mockError = {
+        status: HttpStatusCode.NotFound,
+        statusText: messageError
+      };
+
+      const idProduct = '5';
+     
+      productService.getProduct(idProduct)
+      .subscribe({
+        error: (error)=> {
+          expect(error).toEqual('El producto no existe');
+          doneFn()
+        }
+      });
+
+      const url = `${environment.API_URL}/products/${idProduct}`;
+      const req = httpController.expectOne(url);
+      expect(req.request.method).toEqual('GET');
+      req.flush(messageError, mockError);
+    });
+  });
+
+  it('should return right msg when code is undefined', (doneFn) => {
+    //Arrage
+    const productId = '4';
+    const msgError = 'Error message';
+    const mockError = {
+      status: HttpStatusCode.BadRequest,
+      statusText: msgError
+    }
+    //Act
+    productService.getProduct(productId)
+      .subscribe({
+        error: (error) => {
+          expect(error).toEqual('Ups algo salio mal');
+          doneFn()
+        }
+      });
+    //Assert
+    const url = `${environment.API_URL}/products/${productId}`;
+    const req = httpController.expectOne(url);
+    expect(req.request.method).toEqual('GET');
+    req.flush(msgError, mockError);
   });
 });
